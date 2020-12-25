@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:queues/constants.dart';
 
 class Model4 extends StatefulWidget {
   @override
@@ -11,12 +12,9 @@ class _Model4State extends State<Model4> {
 
   GlobalKey<FormState> _key = GlobalKey<FormState>();
 
-  double arrival_time;
   double arrival_rate;
   double service_rate;
-  double service_time;
   int c;
-  int m;
   String l;
   String w;
   String wq;
@@ -25,11 +23,7 @@ class _Model4State extends State<Model4> {
   
   sigma(last, r){
     var sum = 0.0;
-    List x = [];
-    for(int i = 0; i <= last + 1; i++){
-      x.add(i);
-    }
-    for(int j in x){
+    for(int j = 0; j <= last; j++){
       sum += ((pow(r,j)) / (factorial(j)));
     }
     return sum;
@@ -37,11 +31,7 @@ class _Model4State extends State<Model4> {
 
   sigma2(last){
     var sum = 0.0;
-    List x = [];
-    for(int i = 0; i <= last + 1; i++){
-      x.add(i);
-    }
-    for(int j in x){
+    for(int j = 0; j <= last; j++){
       sum += (1 / factorial(j)) * (pow((arrival_rate / service_rate), j));
     }
     return sum;
@@ -49,16 +39,14 @@ class _Model4State extends State<Model4> {
   _calculate(){
     if(arrival_rate != null && service_rate != null && c != null){
 
-      // double arrival_rate = 1 / arrival_time;
-      // double service_rate = 1 / service_time;
       double p0 = 0;
       double r = arrival_rate / service_rate;
       double rho = r / c;
 
       double ws = 1/service_rate;
 
-       double part1 = sigma(c - 1, r);
-      double part2 = ((c * (pow(r, 3))) / (factorial(c) * (c - r)));
+      double part1 = sigma(c - 1, r);
+      double part2 = ((c * pow(r, c)) / (factorial(c) * (c - r)));
       double part11 = sigma2(c - 1);
       double part22 = (1 / factorial(c)) * (pow((arrival_rate / service_rate),  c)) * ((c * service_rate) / ((c * service_rate) - arrival_rate));
 
@@ -69,11 +57,15 @@ class _Model4State extends State<Model4> {
         p0 = 1/(part11 + part22);
       }
       setState(() {
-        lq = ((((r * (c + 1)) / c) / (factorial(c) * (((1 - r) / c) * 2))) * p0).toStringAsFixed(2);
+
+        double lqUp = pow(r, c+1) / c;
+        double lqDown = factorial(c) * pow((1-r)/c, 2); 
+        lq = ((lqUp/ lqDown) * p0).toStringAsFixed(2);
+
         wq = (double.parse(lq) / arrival_rate).toStringAsFixed(2);
-        w = (double.parse(wq) + (1 / service_rate)).toStringAsFixed(2);
+        w = (double.parse(lq) + (1 / service_rate)).toStringAsFixed(2);
         l = (double.parse(lq) + (arrival_rate / service_rate)).toStringAsFixed(2);
-        ci = (((c - r) / c) * (100)).toStringAsFixed(2);
+        ci = (((c - r) / c)).toStringAsFixed(2);
       });
       // print('row ${(1/rho) / (1+rho)}');
       // if(rho < 1){
@@ -151,6 +143,7 @@ class _Model4State extends State<Model4> {
                       },
                       onChanged: (value) {
                         setState(() {
+                          l = null;
                           arrival_rate = double.tryParse(value);
                         });
                         print(arrival_rate);
@@ -177,6 +170,7 @@ class _Model4State extends State<Model4> {
                       },
                       onChanged: (value) {
                         setState(() {
+                          l = null;
                           service_rate = double.tryParse(value);
                         });
                         
@@ -192,7 +186,7 @@ class _Model4State extends State<Model4> {
                     child: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Enter k'
+                        labelText: 'Enter C'
                       ),
                       validator: (value) {
                         if(value.isEmpty){
@@ -240,136 +234,11 @@ class _Model4State extends State<Model4> {
                     Column(
                       children: [
                         Divider(color: Colors.black,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .4,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'L = $l',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .7,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'W = $w',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .2,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Wq = $wq',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' Lq = $lq',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' Ci = $ci',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        result('L = $l', context, MediaQuery.of(context).size.width * .4, MediaQuery.of(context).size.height * .15),
+                        result('W = $w', context, MediaQuery.of(context).size.width * .7, MediaQuery.of(context).size.height * .15),
+                        result('Wq = $wq', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
+                        result(' Lq = $lq', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
+                        result(' Ci = $ci', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                       ],
                     )
                   : SizedBox()

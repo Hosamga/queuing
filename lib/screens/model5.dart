@@ -3,60 +3,106 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:queues/constants.dart';
 
-class Model3 extends StatefulWidget {
+class Model5 extends StatefulWidget {
   @override
-  _Model3State createState() => _Model3State();
+  _Model5State createState() => _Model5State();
 }
 
-class _Model3State extends State<Model3> {
+class _Model5State extends State<Model5> {
 
   GlobalKey<FormState> _key = GlobalKey<FormState>();
 
-  double arrival_time;
   double arrival_rate;
   double service_rate;
-  double service_time;
+  int c;
   int k;
-  int m;
   String l;
   String w;
   String wq;
   String lq;
+  String ci;
   
-  _calculate(){
-    if(arrival_rate != null && service_rate != null && k != null){
+  sigma(last, r){
+    var sum = 0.0;
+    for(int j = 0; j <= last; j++){
+      sum += ((pow(r,j)) / (factorial(j)));
+    }
+    return sum;
+  }
 
-      // double arrival_rate = 1 / arrival_time;
-      // double service_rate = 1 / service_time;
-      double rho = arrival_rate / service_rate;
+  sigma2(last){
+    var sum = 0.0;
+    for(int j = 0; j <= last; j++){
+      sum += (1 / factorial(j)) * (pow((arrival_rate / service_rate), j));
+    }
+    return sum;
+  }
+  _calculate(){
+    if(arrival_rate != null && service_rate != null && c != null && k != null){
+
+      double p0 = 0;
+      double r = arrival_rate / service_rate;
+      double rho = r / c;
+
       double ws = 1/service_rate;
 
-      double pn;
+      double part1 = sigma(c - 1, r);
+      double part2 = ((c * pow(r, c)) / (factorial(c) * (c - r)));
+      double part11 = sigma2(c - 1);
+      double part22 = (1 / factorial(c)) * (pow((arrival_rate / service_rate),  c)) * ((c * service_rate) / ((c * service_rate) - arrival_rate));
 
-      if(rho == 1){
-        pn = 1 / (k+1);
-        setState(() {
-          l = (k/2).toStringAsFixed(2);
-          w = (double.parse(l) / (arrival_rate * (1-pn))).toStringAsFixed(2);
-          wq = (double.parse(w) - ws).toStringAsFixed(2);
-          lq = (arrival_rate * (1 - pn) * double.parse(wq)).toStringAsFixed(2);
-        });
-      }else{
-        print('no');
-        pn = (pow(rho ,k) * ((1 - rho)/ (1-pow(rho, k))));
 
-        setState(() {
-          double up = (1 - (k+1)*pow(rho, k) + k * pow(rho, k+1));
-          double down = (1-rho) * (1-pow(rho, k+1));
-          l = (rho * (up/down)).toStringAsFixed(2);
-          w = (double.parse(l) / (arrival_rate * (1-pn))).toStringAsFixed(2);
-          wq = (double.parse(w) - ws).toStringAsFixed(2);
-          lq = (arrival_rate * (1 - pn) * double.parse(wq)).toStringAsFixed(2);
-        });
+      if(r /c < 1){
+        p0 = 1/(part1 + part2);
+      }else if(r/c >= 1){
+        p0 = 1/(part11 + part22);
       }
-      
+      setState(() {
+
+        double lqUp = pow(r, c+1) / c;
+        double lqDown = factorial(c) * pow((1-r)/c, 2); 
+        lq = ((lqUp/ lqDown) * p0).toStringAsFixed(2);
+
+        wq = (double.parse(lq) / arrival_rate).toStringAsFixed(2);
+        w = (double.parse(lq) + (1 / service_rate)).toStringAsFixed(2);
+        l = (double.parse(lq) + (arrival_rate / service_rate)).toStringAsFixed(2);
+        ci = (((c - r) / c)).toStringAsFixed(2);
+      });
+      // print('row ${(1/rho) / (1+rho)}');
+      // if(rho < 1){
+      //   double p = 0;
+      //   for(int i = 0; i <= c-1; i++){
+      //     p += ((pow(r, i)/factorial(i)) + ((c * pow(r, c)) / (factorial(c) * (c-r))));
+      //   }
+      //   p0 = 1/p;
+      //   print('p0 $p0');
+      // }else if(rho >= 1){
+      //   double p = 0;
+      //   for(int i = 0; i <= c-1; i++){
+      //     p += ((1/factorial(i) * pow((arrival_rate/service_rate), i)) + ((1/factorial(c)) * pow(arrival_rate/service_rate, c) * ((c/service_rate)/((c * service_rate) - arrival_rate))));
+      //   }
+      //   p0 = 1/p;
+      //   print('p0 $p0');
+      // }
+      // p0 = 17;
+      // print(p0);
+      // setState(() {
+      //   lq = (((pow(r, c+1)/c) / (factorial(c) * (1-pow(r/c, 2)))) * p0).toStringAsFixed(2);
+      //   wq = (double.parse(lq)/arrival_rate).toStringAsFixed(2);
+      //   w = ((double.parse(lq) / arrival_rate) + 1/service_rate).toStringAsFixed(2);
+      //   l = (double.parse(lq) + (arrival_rate/service_rate)).toStringAsFixed(2);
+      //   ci = (c-r).toStringAsFixed(2);
+      //   print(lq);
+      // });
+
+
       
     }
+  }
+
+  int factorial(int n) {
+    if (n < 0) throw ('Negative numbers are not allowed.');
+    return n <= 1 ? 1 : n * factorial(n - 1);
   }
 
   @override
@@ -67,7 +113,7 @@ class _Model3State extends State<Model3> {
         elevation: 0,
         backgroundColor: Color.fromRGBO(8, 4, 92, 1),
         title: Text(
-          'M / M / 1 / k',
+          'M / M / C / K',
           style: TextStyle(
             fontWeight: FontWeight.bold
           ),
@@ -141,7 +187,27 @@ class _Model3State extends State<Model3> {
                     child: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Enter k'
+                        labelText: 'Enter C'
+                      ),
+                      validator: (value) {
+                        if(value.isEmpty){
+                          return 'Please fill this input';
+                        }
+                        if(int.tryParse(value) == null){
+                          return 'Please enter a valid number';
+                        }
+                      },
+                      onSaved: (newValue) {
+                        c = int.parse(newValue);
+                      },
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * .7,
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Enter K'
                       ),
                       validator: (value) {
                         if(value.isEmpty){
@@ -180,12 +246,12 @@ class _Model3State extends State<Model3> {
                         _key.currentState.save();
                         print(arrival_rate);
                         print(service_rate);
-                        print(k);
+                        print(c);
                         _calculate();
                       },
                     ),
                   ),
-                  arrival_rate != null && service_rate != null && k != null && l != null && w != null && wq != null && lq != null ?
+                  arrival_rate != null && service_rate != null && c != null && l != null && w != null && wq != null && lq != null ?
                     Column(
                       children: [
                         Divider(color: Colors.black,),
@@ -193,6 +259,7 @@ class _Model3State extends State<Model3> {
                         result('W = $w', context, MediaQuery.of(context).size.width * .7, MediaQuery.of(context).size.height * .15),
                         result('Wq = $wq', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
                         result(' Lq = $lq', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
+                        result(' Ci = $ci', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                       ],
                     )
                   : SizedBox()

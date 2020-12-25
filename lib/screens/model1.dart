@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queues/constants.dart';
 
 class Model1 extends StatefulWidget {
   @override
@@ -13,7 +14,6 @@ class _Model1State extends State<Model1> {
   double service_time;
   int k;
   int m;
-  String type;
   int ti;
   
   _calculate_ti(){
@@ -26,11 +26,14 @@ class _Model1State extends State<Model1> {
         print('result $result'); 
         int n = k;
         int t = result;
+
         while(n == k){
           t--;
+          print(t);
           n = (arrival_rate * t).floor() - ((service_rate * t) - (service_rate/arrival_rate)).floor();
           print(n);
         }
+        //result = i;
         result = t + 1;
         print(result);
         setState(() {
@@ -208,356 +211,33 @@ class _Model1State extends State<Model1> {
                       },
                     ),
                   ),
-                  arrival_time != null && service_time != null && (1/service_time) < (1/arrival_time) && ti != null ?
+                  arrival_time != null && service_time != null && (1/service_time) < (1/arrival_time) && k != null &&ti != null ?
                     Column(
                       children: [
                         Divider(color: Colors.black,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .4,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'ti is $ti',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .7,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'when   t < 1/λ   ⮕  n(t) = 0',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .2,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'when \n  1/λ <= t < ti   ⮕  n(t) \n = [ 1/${arrival_time.floor()} t ] - [ 1/${service_time.floor()} t - $arrival_time/$service_time ]',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when  \n  t >= ti   ⮕  n(t) alternates between ${k-1} and ${k-2}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        result('ti is $ti', context, MediaQuery.of(context).size.width * .4, MediaQuery.of(context).size.height * .15),
+                        result('when   t < 1/λ   ⮕  n(t) = 0', context, MediaQuery.of(context).size.width * .7, MediaQuery.of(context).size.height * .15),
+                        result('when \n  1/λ <= t < ti   ⮕  n(t) \n = [ 1/${arrival_time.floor()} t ] - [ 1/${service_time.floor()} t - $arrival_time/$service_time ]', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
+                        result(' when  \n  t >= ti   ⮕  n(t) alternates between ${k-1} and ${k-2}', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                         Divider(color: Colors.black),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when   n = 0   ⮕  wq(n) = 0',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when  \n n < λ ti   ⮕  wq(n) = ${((1/(1/service_time)) / (1/(1/arrival_time))).floor()} ( n - 1)',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .2,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when  \n n >= λ ti   ⮕  wq(n) alternates between  \n ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 2)} And  ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 3)}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        result(' when   n = 0   ⮕  wq(n) = 0', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
+                        result(' when  \n n < λ ti   ⮕  wq(n) = ${((1/(1/service_time)) / (1/(1/arrival_time))).floor()} ( n - 1)', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
+                        result(' when  \n n >= λ ti   ⮕  wq(n) alternates between  \n ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 2)} And  ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 3)}', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
+                        
                       ],
                     )
-                  : arrival_time != null && service_time != null && (1/service_time) > (1/arrival_time) && ti != null ?
+                  : arrival_time != null && service_time != null && (1/service_time) > (1/arrival_time) && m != null && ti != null ?
                   Column(
                       children: [
                         Divider(color: Colors.black,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .4,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'ti is $ti',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .7,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'when   t < $ti   ⮕  n(t) \n = $m + [ 1/$arrival_time t] - [ 1/$service_time t]',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .2,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'when \n  t >= $ti   ⮕  n(t) \n alternates between 0 and 1',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        result('ti is $ti', context, MediaQuery.of(context).size.width * .4, MediaQuery.of(context).size.height * .15),
+                        result('when   t < $ti   ⮕  n(t) \n = $m + [ 1/$arrival_time t] - [ 1/$service_time t]', context, MediaQuery.of(context).size.width * .7, MediaQuery.of(context).size.height * .15),
+                        result('when \n  t >= $ti   ⮕  n(t) \n alternates between 0 and 1', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
                         Divider(color: Colors.black,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .15,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when   n = 0   ⮕  wq(n) = ${((m-1) / (2*(1/arrival_time))).floor()}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .2,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when  \n n <= λ ti   ⮕  wq(n) \n = ( ${m-1} + n ) ($service_time) - n($arrival_time)',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * .95,
-                              height: MediaQuery.of(context).size.height * .2,
-                              padding: EdgeInsets.all(18),
-                              child: Card(
-                                elevation: 8,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      ' when  \n n > λ ti   ⮕  wq(n) = 0',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        result(' when   n = 0   ⮕  wq(n) = ${((m-1) / (2*(1/service_time))).floor()}', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
+                        result(' when  \n n <= λ ti   ⮕  wq(n) \n = ( ${m-1} + n ) ($service_time) - n($arrival_time)', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
+                        result(' when  \n n > λ ti   ⮕  wq(n) = 0', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
+                        
                       ],
                     ) : SizedBox()
                 ],
