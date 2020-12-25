@@ -1,12 +1,28 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:queues/constants.dart';
 
 class Model1 extends StatefulWidget {
+  final List<Color> availableColors = [
+    Colors.purpleAccent,
+    Colors.yellow,
+    Colors.lightBlue,
+    Colors.orange,
+    Colors.pink,
+    Colors.redAccent,
+  ];
   @override
   _Model1State createState() => _Model1State();
 }
 
 class _Model1State extends State<Model1> {
+
+   final Color barBackgroundColor = const Color(0xff72d8bf);
+  final Duration animDuration = const Duration(milliseconds: 250);
+  int touchedIndex;
+
+  bool isPlaying = false;
+
 
   GlobalKey<FormState> _key = GlobalKey<FormState>();
 
@@ -15,6 +31,7 @@ class _Model1State extends State<Model1> {
   int k;
   int m;
   int ti;
+  List n_group;
   
   _calculate_ti(){
     if(arrival_time != null && service_time != null){
@@ -39,11 +56,97 @@ class _Model1State extends State<Model1> {
         setState(() {
           ti = result;
         });
+        kChart(ti);
       }else if(arrival_rate < service_rate){
-        ti = (m / (service_rate - arrival_rate)).floor();
+
+          int t = (m / (service_rate - arrival_rate)).floor();
+          int n = m;
+          int i;
+          for(i = 0; i < t; i++){
+            n = m + ((1/arrival_time) * i).floor() - ((1/service_time) * i).floor(); 
+            if(n == 0){
+              break;
+            }   
+          }
+          t = i;
+          
+        setState((){
+          ti = t;
+        });
+        mChart(ti);
+        
         print(ti);
       }
     }
+  }
+
+  List<Map> mGroup = [];
+  List<Map> kGroup = [];
+
+  kChart(ti){
+    int t = ti;
+
+    List ti_group = [];
+    List n_group = [];
+    List<Map> group_inside = [];
+
+    for(int i = 0; i <= t; i+=2){
+      ti_group.add(i);
+      n_group.add(
+        ((1/arrival_time) * i).floor() - (((1/service_time) * i) - ((1/service_time) / (1/arrival_time))).floor()
+      );
+    }
+
+    for(int i = 1; i < ti_group.length; i++){
+      group_inside.add({
+        't': ti_group[i],
+        'n': n_group[i]
+      });
+    }
+    setState(() {
+      kGroup = group_inside;
+    });
+
+
+  }
+
+  mChart(ti){
+    List<int> ti_group = [];
+    List<int> n_group = [];
+    List<Map> group_inside = [];
+    
+    ti_group.add(0);
+    n_group.add(
+      m
+    );
+    group_inside.add(
+      {
+        't': 0,
+        'n': m
+      }
+    );
+
+    for(int i = 1; i <= ti; i++){
+      ti_group.add(i);
+      n_group.add(
+        m + ((1/arrival_time) * i).floor() - ((1/service_time) * i).floor()
+      );
+    }
+    
+    print('ti group ${ti_group.length}');
+    print('n group ${n_group.length}');
+    for(int j = 1; j < ti_group.length; j++){
+      group_inside.add(
+        {
+          't': ti_group[j],
+          'n': n_group[j]
+        }
+      );
+    }
+    print('group ${group_inside}');
+    setState(() {
+      mGroup = group_inside;
+    });
   }
 
   @override
@@ -85,6 +188,7 @@ class _Model1State extends State<Model1> {
                       },
                       onChanged: (value) {
                         setState(() {
+                          ti = null;
                           arrival_time = double.tryParse(value);
                         });
                         print(arrival_time);
@@ -111,6 +215,7 @@ class _Model1State extends State<Model1> {
                       },
                       onChanged: (value) {
                         setState(() {
+                          ti = null;
                           service_time = double.tryParse(value);
                         });
                         
@@ -223,7 +328,38 @@ class _Model1State extends State<Model1> {
                         result(' when   n = 0   ⮕  wq(n) = 0', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                         result(' when  \n n < λ ti   ⮕  wq(n) = ${((1/(1/service_time)) / (1/(1/arrival_time))).floor()} ( n - 1)', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                         result(' when  \n n >= λ ti   ⮕  wq(n) alternates between  \n ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 2)} And  ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 3)}', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
-                        
+                         BarChart(BarChartData(
+                          axisTitleData: FlAxisTitleData(
+                            bottomTitle: AxisTitle(
+                              showTitle: true,
+                              titleText: 'Time',
+                              textAlign: TextAlign.center
+                            ),
+                            leftTitle: AxisTitle(
+                              showTitle: true,
+                              titleText: 'n(t)',
+                              textAlign: TextAlign.center
+                            ),
+                          ),
+                          borderData: FlBorderData(
+                          border: Border(
+                            top: BorderSide.none,
+                            right: BorderSide.none,
+                            left: BorderSide(width: 1),
+                            bottom: BorderSide(width: 1),
+                        )),
+                        groupsSpace: 10,
+                        barGroups: kGroup.map((e){
+                          return BarChartGroupData(x: e['t'], 
+                          barRods:[
+                            BarChartRodData(
+                              y: double.parse(e['n'].toString()), 
+                              width: 1.5, 
+                              colors: [Colors.amber])
+                            ]);
+                          }).toList()
+                        )),
+                        SizedBox(height: 20,),
                       ],
                     )
                   : arrival_time != null && service_time != null && (1/service_time) > (1/arrival_time) && m != null && ti != null ?
@@ -237,7 +373,38 @@ class _Model1State extends State<Model1> {
                         result(' when   n = 0   ⮕  wq(n) = ${((m-1) / (2*(1/service_time))).floor()}', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                         result(' when  \n n <= λ ti   ⮕  wq(n) \n = ( ${m-1} + n ) ($service_time) - n($arrival_time)', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
                         result(' when  \n n > λ ti   ⮕  wq(n) = 0', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
-                        
+                        BarChart(BarChartData(
+                          axisTitleData: FlAxisTitleData(
+                            bottomTitle: AxisTitle(
+                              showTitle: true,
+                              titleText: 'Time',
+                              textAlign: TextAlign.center
+                            ),
+                            leftTitle: AxisTitle(
+                              showTitle: true,
+                              titleText: 'n(t)',
+                              textAlign: TextAlign.center
+                            ),
+                          ),
+                          borderData: FlBorderData(
+                          border: Border(
+                            top: BorderSide.none,
+                            right: BorderSide.none,
+                            left: BorderSide(width: 1),
+                            bottom: BorderSide(width: 1),
+                        )),
+                        groupsSpace: 10,
+                        barGroups: mGroup.map((e){
+                          return BarChartGroupData(x: e['t'], 
+                          barRods:[
+                            BarChartRodData(
+                              y: double.parse(e['n'].toString()), 
+                              width: 1.5, 
+                              colors: [Colors.amber])
+                            ]);
+                          }).toList()
+                        )),
+                        SizedBox(height: 20,),
                       ],
                     ) : SizedBox()
                 ],

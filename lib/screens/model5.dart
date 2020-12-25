@@ -22,80 +22,8 @@ class _Model5State extends State<Model5> {
   String lq;
   String ci;
   
-  sigma(last, r){
-    var sum = 0.0;
-    for(int j = 0; j <= last; j++){
-      sum += ((pow(r,j)) / (factorial(j)));
-    }
-    return sum;
-  }
-
-  sigma2(last){
-    var sum = 0.0;
-    for(int j = 0; j <= last; j++){
-      sum += (1 / factorial(j)) * (pow((arrival_rate / service_rate), j));
-    }
-    return sum;
-  }
   _calculate(){
     if(arrival_rate != null && service_rate != null && c != null && k != null){
-
-      double p0 = 0;
-      double r = arrival_rate / service_rate;
-      double rho = r / c;
-
-      double ws = 1/service_rate;
-
-      double part1 = sigma(c - 1, r);
-      double part2 = ((c * pow(r, c)) / (factorial(c) * (c - r)));
-      double part11 = sigma2(c - 1);
-      double part22 = (1 / factorial(c)) * (pow((arrival_rate / service_rate),  c)) * ((c * service_rate) / ((c * service_rate) - arrival_rate));
-
-
-      if(r /c < 1){
-        p0 = 1/(part1 + part2);
-      }else if(r/c >= 1){
-        p0 = 1/(part11 + part22);
-      }
-      setState(() {
-
-        double lqUp = pow(r, c+1) / c;
-        double lqDown = factorial(c) * pow((1-r)/c, 2); 
-        lq = ((lqUp/ lqDown) * p0).toStringAsFixed(2);
-
-        wq = (double.parse(lq) / arrival_rate).toStringAsFixed(2);
-        w = (double.parse(lq) + (1 / service_rate)).toStringAsFixed(2);
-        l = (double.parse(lq) + (arrival_rate / service_rate)).toStringAsFixed(2);
-        ci = (((c - r) / c)).toStringAsFixed(2);
-      });
-      // print('row ${(1/rho) / (1+rho)}');
-      // if(rho < 1){
-      //   double p = 0;
-      //   for(int i = 0; i <= c-1; i++){
-      //     p += ((pow(r, i)/factorial(i)) + ((c * pow(r, c)) / (factorial(c) * (c-r))));
-      //   }
-      //   p0 = 1/p;
-      //   print('p0 $p0');
-      // }else if(rho >= 1){
-      //   double p = 0;
-      //   for(int i = 0; i <= c-1; i++){
-      //     p += ((1/factorial(i) * pow((arrival_rate/service_rate), i)) + ((1/factorial(c)) * pow(arrival_rate/service_rate, c) * ((c/service_rate)/((c * service_rate) - arrival_rate))));
-      //   }
-      //   p0 = 1/p;
-      //   print('p0 $p0');
-      // }
-      // p0 = 17;
-      // print(p0);
-      // setState(() {
-      //   lq = (((pow(r, c+1)/c) / (factorial(c) * (1-pow(r/c, 2)))) * p0).toStringAsFixed(2);
-      //   wq = (double.parse(lq)/arrival_rate).toStringAsFixed(2);
-      //   w = ((double.parse(lq) / arrival_rate) + 1/service_rate).toStringAsFixed(2);
-      //   l = (double.parse(lq) + (arrival_rate/service_rate)).toStringAsFixed(2);
-      //   ci = (c-r).toStringAsFixed(2);
-      //   print(lq);
-      // });
-
-
       
     }
   }
