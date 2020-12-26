@@ -3,26 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:queues/constants.dart';
 
 class Model1 extends StatefulWidget {
-  final List<Color> availableColors = [
-    Colors.purpleAccent,
-    Colors.yellow,
-    Colors.lightBlue,
-    Colors.orange,
-    Colors.pink,
-    Colors.redAccent,
-  ];
   @override
   _Model1State createState() => _Model1State();
 }
 
 class _Model1State extends State<Model1> {
-
-   final Color barBackgroundColor = const Color(0xff72d8bf);
-  final Duration animDuration = const Duration(milliseconds: 250);
-  int touchedIndex;
-
-  bool isPlaying = false;
-
 
   GlobalKey<FormState> _key = GlobalKey<FormState>();
 
@@ -44,15 +29,14 @@ class _Model1State extends State<Model1> {
         int n = k;
         int t = result;
 
-        while(n == k){
-          t--;
-          print(t);
-          n = (arrival_rate * t).floor() - ((service_rate * t) - (service_rate/arrival_rate)).floor();
-          print(n);
+        int j; 
+        for(j = 0; j <= t; j++){
+          n = (arrival_rate * j).floor() - ((service_rate * j) - (service_rate/arrival_rate)).floor();
+          if(n == k){
+            break;
+          }
         }
-        //result = i;
-        result = t + 1;
-        print(result);
+        result = j;
         setState(() {
           ti = result;
         });
@@ -316,7 +300,7 @@ class _Model1State extends State<Model1> {
                       },
                     ),
                   ),
-                  arrival_time != null && service_time != null && (1/service_time) < (1/arrival_time) && k != null &&ti != null ?
+                  arrival_time != null && service_time != null && (1/service_time) < (1/arrival_time) && k != null && ti != null ?
                     Column(
                       children: [
                         Divider(color: Colors.black,),
@@ -328,7 +312,7 @@ class _Model1State extends State<Model1> {
                         result(' when   n = 0   ⮕  wq(n) = 0', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                         result(' when  \n n < λ ti   ⮕  wq(n) = ${((1/(1/service_time)) / (1/(1/arrival_time))).floor()} ( n - 1)', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .15),
                         result(' when  \n n >= λ ti   ⮕  wq(n) alternates between  \n ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 2)} And  ${((1/(1/service_time)) / (1/(1/arrival_time))).floor() * (((1/arrival_time) * ti) - 3)}', context, MediaQuery.of(context).size.width * .95, MediaQuery.of(context).size.height * .2),
-                         BarChart(BarChartData(
+                        BarChart(BarChartData(
                           axisTitleData: FlAxisTitleData(
                             bottomTitle: AxisTitle(
                               showTitle: true,
